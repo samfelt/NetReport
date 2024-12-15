@@ -6,7 +6,7 @@ from .results import print_group_table
 from .colors import colors as c
 
 __prog__ = "NetCheck"
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 def main():
     """
@@ -19,9 +19,9 @@ def main():
         print(f"{__prog__} v{__version__}")
         return 0
 
-    config = load_config("config.json")
+    config = load_config()
+
     settings = config["settings"]
-    groups = config["groups"]
 
     hosts = [ Host(host["hostname"], host["name"], host["group"]) for host in config["hosts"] ]
 
