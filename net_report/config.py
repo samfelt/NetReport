@@ -5,19 +5,19 @@ import json
 default_config = {
     "hosts" : [
         {
-            "hostname" : "www.google.com",
+            "address" : "www.google.com",
             "group": "Default",
             "name" : "Google",
             "ping" : True
         },
         {
-            "hostname" : "www.amazon.com",
+            "address" : "www.amazon.com",
             "group": "Default",
             "name" : "Amazon",
             "ping" : True
         },
         {
-            "hostname" : "1.1.1.1",
+            "address" : "1.1.1.1",
             "group": "Default",
             "name" : "Cloudflare",
             "ping" : True

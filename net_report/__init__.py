@@ -23,13 +23,13 @@ def main():
 
     settings = config["settings"]
 
-    hosts = [ Host(host["hostname"], host["name"], host["group"]) for host in config["hosts"] ]
+    hosts = [ Host(host["address"], host["name"], host["group"]) for host in config["hosts"] ]
 
     clear = f"\r\033[K\r"
-    for host in hosts:
-        print(f"{clear}Pinging {c.Bold}{host.name}{c.NoC} ({host.get_address()})...",
+    for i, host in enumerate(hosts):
+        print(f"{clear}({i}/{len(hosts)}) | Pinging {c.Bold}{host.name}{c.NoC} ({host.get_address()})...",
               end="", flush=True)
-        host.ping_test(5, 0.3, 1)
+        host.ping_test(settings["ping_packets"], 0.3, settings["ping_timeout"])
     print(clear, end="", flush=True)
 
     groups = {}
