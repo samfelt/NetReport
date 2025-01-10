@@ -5,19 +5,32 @@ from .colors import colors as c
 
 class Host(object):
 
-    def __init__(self, address, name=None, group=None, ports=[]):
+    def __init__(self, address, name=None, group=None, ports=[], resolve=False):
 
         self.name = name if name is not None else address
         self.group = group
+
         self.hostname = None
         self.ips = []
-
         self.resolve_error = None
+
         self.up = None
         self.rtt = 0
         self.ports_to_test = ports
         self.ports = {}
 
+        if resolve:
+            self._resolve()
+
+    def __repr__(self):
+        return f"Host({self.name}<{self.hostname}><{self.ips[0]}>)"
+
+    def _resolve(self):
+        """Attempt to resolve the address given during initialization. The
+        objects hostname will be set as 'hostname' and a list of ip addresses
+        associated with that hostname will be put in ips. If a resolution error
+        occurs, it will be put in 'resolve_error'
+        """
         if icmplib.is_hostname(address):
             self.hostname = address
             try:
@@ -32,20 +45,14 @@ class Host(object):
         else:
             raise ValueError("address not identified as hostname or ip address")
 
-    def __repr__(self):
-        return f"Host({self.name}<{self.hostname}><{self.ips[0]}>)"
 
     def get_address(self):
         address = self.hostname if self.hostname is not None else self.ips[0]
         return address
 
     def table_list(self):
-        """
-        Return a list the formated stats that will be printed in the table in
-        order. This is:
-        * Name
-        * Status
-        * Ping time (rtt)
+        """Return a list the formated stats that will be printed in the table
+        in order. This is: * Name * Status * Ping time (rtt)
         """
 
         up = f"{c.Green}Up{c.NoC}"
