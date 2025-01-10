@@ -7,6 +7,7 @@ class Host(object):
 
     def __init__(self, address, name=None, group=None, ports=[], resolve=False):
 
+        self.given_address = address
         self.name = name if name is not None else address
         self.group = group
 
@@ -31,22 +32,29 @@ class Host(object):
         associated with that hostname will be put in ips. If a resolution error
         occurs, it will be put in 'resolve_error'
         """
-        if icmplib.is_hostname(address):
-            self.hostname = address
+        if icmplib.is_hostname(self.given_address):
+            self.hostname = self.given_address
             try:
-                self.ips = icmplib.resolve(address)
+                self.ips = icmplib.resolve(self.given_address)
                 self.resolve_error = False
             except icmplib.exceptions.NameLookupError as e:
                 self.resolve_error = True
-        elif icmplib.is_ipv4_address(address):
-            self.ips = [address]
-        elif icmplib.is_ipv6_address(address):
-            self.ips = [address]
+        elif icmplib.is_ipv4_address(self.given_address):
+            self.ips = [self.given_address]
+        elif icmplib.is_ipv6_address(self.given_address):
+            self.ips = [self.given_address]
         else:
             raise ValueError("address not identified as hostname or ip address")
 
 
     def get_address(self):
+        """Return the address of the host as a string. This will be the
+        hostname or the first ip address. To ensure that one of these exists,
+        run the resolve method if 'hostname' is still None
+        """
+        if self.hostname is None:
+            self._resolve()
+
         address = self.hostname if self.hostname is not None else self.ips[0]
         return address
 
