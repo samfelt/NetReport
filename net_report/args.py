@@ -12,5 +12,9 @@ def parse_args(argv=None):
         "--version", action="store_true", help="Print version info"
     )
 
+    parser.add_argument(
+        "--quick", "-q", action="store_true", help="Test the quick test category"
+    )
+
     args = parser.parse_args(argv)
     return args
