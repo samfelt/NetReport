@@ -13,6 +13,13 @@ def parse_args(argv=None):
     )
 
     parser.add_argument(
+        "--check-config", "-c", action="store_true", help="Check for any errors in the config file"
+    )
+    parser.add_argument(
+        "--skip-config-check", "-s", action="store_true", help="Skip config verification, may lead to unhandled exceptions"
+    )
+
+    parser.add_argument(
         "--quick", "-q", action="store_true", help="Test the quick test category"
     )
 

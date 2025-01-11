@@ -1,6 +1,6 @@
 import sys
 from .args import parse_args
-from .config import load_config
+from .config import load_config, valid_config, verify_config
 from .host import Host
 from .results import print_group_table
 from .colors import colors as c
@@ -20,6 +20,22 @@ def main():
         return 0
 
     config = load_config()
+    if args.check_config:
+        errors = verify_config(config)
+        if len(errors) == 0:
+            print("config file passed check")
+            return 0
+        else:
+            print(f"config file contains {len(errors)} errors:")
+            print("------------------------------")
+            for error in errors:
+                print(error)
+            return -1
+
+    if not args.skip_config_check and not valid_config(config):
+        print("There is a problem with the config file")
+        print("Run with '--check-config' to see errors")
+        return -1
 
     settings = config["settings"]
 
