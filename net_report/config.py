@@ -4,7 +4,7 @@ import json
 
 _sections = sorted(["groups", "hosts", "settings"])
 _host_keys= sorted(["address", "name", "group", "ping", "ports"])
-_settings=sorted(["quick_test", "max_threads", "ping_packets", "ping_timeout"])
+_settings=sorted(["quick_group", "skip_quick", "max_threads", "ping_packets", "ping_timeout"])
 _default_config = {
     "groups" : [
         "Default"
@@ -33,6 +33,8 @@ _default_config = {
         }
     ],
     "settings": {
+        "quick_group": "Quick Test",
+        "skip_quick": True,
         "ping_packets": 5,
         "ping_timeout": 2,
         "max_threads": 10

@@ -24,7 +24,12 @@ class Host(object):
             self._resolve()
 
     def __repr__(self):
-        return f"Host({self.name}<{self.hostname}><{self.ips[0]}>)"
+        try:
+            ip = self.ips[0]
+        except IndexError:
+            ip = None
+
+        return f"Host({self.name}<{self.hostname}><{ip}>)"
 
     def _resolve(self):
         """Attempt to resolve the address given during initialization. The

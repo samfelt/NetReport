@@ -39,10 +39,15 @@ def main():
 
     settings = config["settings"]
 
-    hosts = [ Host(host["address"], host["name"], host["group"], host["ports"]) for host in config["hosts"] ]
+    all_hosts = [ Host(host["address"], host["name"], host["group"], host["ports"]) for host in config["hosts"] ]
+    quick_hosts = [ host for host in all_hosts if host.group == settings["quick_group"] ]
+    hosts = []
+
+    if settings["skip_quick"]:
+        hosts = list(set(all_hosts) - set(quick_hosts))
 
     if args.quick:
-        hosts = [ host for host in hosts if host.group == settings["quick_test"] ]
+        hosts = quick_hosts
 
     # Run pings
     clear = f"\r\033[K\r"
