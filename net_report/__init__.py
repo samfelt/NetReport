@@ -11,7 +11,7 @@ from .colors import colors as c
 import time
 
 __prog__ = "NetReport"
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 
 def run():
