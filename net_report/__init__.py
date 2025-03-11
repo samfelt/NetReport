@@ -1,14 +1,20 @@
 import sys
+import threading
+from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
 from .args import parse_args
 from .config import load_config, valid_config, verify_config
 from .host import Host
 from .results import print_group_table
 from .colors import colors as c
 
+import time
+
 __prog__ = "NetReport"
 __version__ = "0.0.3"
 
-def main():
+
+def run():
     """
     Main Function
     """
@@ -50,19 +56,33 @@ def main():
         hosts = quick_hosts
 
     # Run pings
-    clear = f"\r\033[K\r"
-    for i, host in enumerate(hosts):
-        print(f"{clear}({i+1}/{len(hosts)}) | Pinging {c.Bold}{host.name}{c.NoC} ({host.get_address()})...",
-              end="", flush=True)
-        host.ping_test(settings["ping_packets"], 0.3, settings["ping_timeout"])
-    print(clear, end="", flush=True)
+    with ThreadPoolExecutor(
+        max_workers=settings["max_threads"],
+        thread_name_prefix="NetRepThread"
+    ) as pool:
 
-    # Run ports
-    for i, host in enumerate(hosts):
-        print(f"{clear}({i+1}/{len(hosts)}) | Scanning ports {c.Bold}{host.name}{c.NoC} ({host.get_address()})...",
-              end="", flush=True)
-        host.port_test(host.ports_to_test, 2)
-    print(clear, end="", flush=True)
+        futures = {}
+        for h in hosts:
+            ping_future = pool.submit(h.ping_test, settings["ping_packets"], 0.3, settings["ping_timeout"])
+            port_future = pool.submit(h.port_test, h.ports_to_test, 2)
+            futures[h] = {
+                "ping": ping_future,
+                "port": port_future,
+            }
+        ping_futures = [future["ping"] for future in futures.values()]
+        port_futures = [future["port"] for future in futures.values()]
+        all_futures = ping_futures + port_futures
+
+        print(f"\033[s", end="", flush=True)
+        clear = f"\033[K"
+        while not all([future.done() for future in all_futures]):
+            pings_done = [f.done() for f in ping_futures].count(True)
+            ports_done = [f.done() for f in port_futures].count(True)
+            print(f"\033[u", end="", flush=True)
+            print(f"{clear}({pings_done}/{len(ping_futures)}) Ping tests")
+            print(f"{clear}({ports_done}/{len(port_futures)}) Port tests")
+            time.sleep(0.5)
+        print(f"\033[u", end="", flush=True)
 
     groups = {}
     for host in hosts:
@@ -76,7 +96,5 @@ def main():
         print_group_table(group_name , [ host.table_list() for host in hosts ])
         print()
 
-#    import ipdb;ipdb.set_trace()
-
 if __name__ == "__main__":
-    exit(main())
+    exit(run())

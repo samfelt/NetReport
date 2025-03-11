@@ -72,20 +72,20 @@ class Host(object):
         down = f"{c.Red}down{c.NoC}"
 
         if self.resolve_error:
-            status = f"{c.Red}DNS error{c.NoC}"
+            state = f"{c.Red}DNS error{c.NoC}"
         else:
-            status = f"{up if self.up else down}"
+            state = f"{up if self.up else down}"
         rtt = None if self.rtt == 0 else f"{int(self.rtt)} ms"
 
         ports = ""
         for port, status in self.ports.items():
             if status:
-                ports += f"{c.Green}{port}{c.NoC}, "
-            else:
                 ports += f"{c.Red}{port}{c.NoC}, "
+            else:
+                ports += f"{c.Green}{port}{c.NoC}, "
         ports = ports[:-2]
 
-        return([self.name, status, rtt, ports])
+        return([self.name, state , rtt, ports])
 
     def ping_test(self, count=4, interval=1, timeout=5):
         address = self.get_address()
