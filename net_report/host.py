@@ -72,9 +72,9 @@ class Host(object):
         down = f"{c.Red}down{c.NoC}"
 
         if self.resolve_error:
-            status = f"{c.Red}DNS error{c.NoC}"
+            state = f"{c.Red}DNS error{c.NoC}"
         else:
-            status = f"{up if self.up else down}"
+            state = f"{up if self.up else down}"
         rtt = None if self.rtt == 0 else f"{int(self.rtt)} ms"
 
         ports = ""
@@ -85,7 +85,7 @@ class Host(object):
                 ports += f"{c.Red}{port}{c.NoC}, "
         ports = ports[:-2]
 
-        return([self.name, status, rtt, ports])
+        return([self.name, state , rtt, ports])
 
     def ping_test(self, count=4, interval=1, timeout=5):
         address = self.get_address()
@@ -115,7 +115,7 @@ class Host(object):
             with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
                 sock.settimeout(timeout)
                 result = sock.connect_ex((address, port))
-                if sock.connect_ex((address, port)):
+                if result == 0:
                     self.ports[port] = True
                 else:
                     self.ports[port] = False
