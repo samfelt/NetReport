@@ -80,9 +80,9 @@ class Host(object):
         ports = ""
         for port, status in self.ports.items():
             if status:
-                ports += f"{c.Red}{port}{c.NoC}, "
-            else:
                 ports += f"{c.Green}{port}{c.NoC}, "
+            else:
+                ports += f"{c.Red}{port}{c.NoC}, "
         ports = ports[:-2]
 
         return([self.name, state , rtt, ports])
@@ -115,7 +115,7 @@ class Host(object):
             with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
                 sock.settimeout(timeout)
                 result = sock.connect_ex((address, port))
-                if sock.connect_ex((address, port)):
+                if result == 0:
                     self.ports[port] = True
                 else:
                     self.ports[port] = False
