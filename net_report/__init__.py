@@ -1,4 +1,5 @@
 import sys
+import socket
 import threading
 from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
@@ -25,6 +26,7 @@ def run():
         print(f"{__prog__} v{__version__}")
         return 0
 
+    # Verify Config File
     config = load_config()
     if args.check_config:
         errors = verify_config(config)
@@ -42,6 +44,14 @@ def run():
         print("There is a problem with the config file")
         print("Run with '--check-config' to see errors")
         return -1
+
+    # Check if current user is able to ping
+    try:
+        test_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_ICMP)
+        test_socket.close()
+    except PermissionError:
+        print("WARNING: Current user can't open ICMP socket")
+        print("         Add gid to net.ipv4.ping_group_range")
 
     settings = config["settings"]
 
